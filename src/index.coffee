@@ -1,6 +1,11 @@
 resourceManagerListener = null
 debugMode = off
 localStoragePrefix = null
+forceParam =
+  force: false
+  silenceWarning: false
+  key: "__force_caching"
+  prefix: "please"
 
 module?.exports = app = angular.module 'ngCachedResource', ['ngResource']
 
@@ -15,6 +20,12 @@ app.provider '$cachedResource', class $cachedResourceProvider
   setLocalStoragePrefix: (prefix) ->
     localStoragePrefix = prefix
 
+  setForceParam: (force = false, silenceWarning = false, key, prefix) ->
+    forceParam.force = true if force is true
+    forceParam.silenceWarning = true if silenceWarning is true
+    forceParam.key = "#{key}" if key?
+    forceParam.prefix = "#{prefix}" if prefix?
+
 $cachedResourceFactory = ['$resource', '$timeout', '$q', '$log', ($resource, $timeout, $q, $log) ->
 
   bindLogFunction = (logFunction) ->
@@ -27,6 +38,7 @@ $cachedResourceFactory = ['$resource', '$timeout', '$q', '$log', ($resource, $ti
     $log:
       debug: if debugMode then bindLogFunction('debug') else (->)
       error: bindLogFunction 'error'
+    forceParam: forceParam
 
   CachedResourceManager = require('./cached_resource_manager')(providerParams)
   resourceManager = new CachedResourceManager($resource, $timeout, $q)
