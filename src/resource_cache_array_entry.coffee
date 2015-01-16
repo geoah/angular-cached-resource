@@ -11,11 +11,8 @@ module.exports = (providerParams) ->
       for instance in instances
         cacheInstanceParams = instance.$params()
         if Object.keys(cacheInstanceParams).length is 0
-          $log.error """
-            instance #{instance} doesn't have any boundParams. Please, make sure you specified them in your resource's initialization, f.e. `{id: "@id"}`, or it won't be cached.
-          """
-        else
-          cacheArrayReferences.push cacheInstanceParams
-          cacheInstanceEntry = new ResourceCacheEntry(@key, cacheInstanceParams).load()
-          cacheInstanceEntry.set instance, dirty
+          cacheInstanceParams["_fc"] = "default"
+        cacheArrayReferences.push cacheInstanceParams
+        cacheInstanceEntry = new ResourceCacheEntry(@key, cacheInstanceParams).load()
+        cacheInstanceEntry.set instance, dirty
       @set cacheArrayReferences, dirty
